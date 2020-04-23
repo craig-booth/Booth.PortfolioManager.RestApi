@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Booth.PortfolioManager.RestApi.Transactions
 {
-  /*  public class CostBaseAdjustment : Transaction
+    public class CostBaseAdjustment : Transaction
     {
-        public override string Type => TransactionType.CostBaseAdjustment.ToRestName();
+        public override string Type => "costbaseadjustment";
         public decimal Percentage { get; set; }
-    } */
+    } 
 }

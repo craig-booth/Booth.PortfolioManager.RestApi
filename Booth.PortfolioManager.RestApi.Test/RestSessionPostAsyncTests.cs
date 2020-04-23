@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.PortfolioManager.RestApi.Client;
@@ -18,9 +19,10 @@ using Booth.PortfolioManager.RestApi.Test.Serialization;
 
 namespace Booth.PortfolioManager.RestApi.Test
 {
-    class RestClientMessageHandlerPostAsyncTests
+    
+    public class RestClientMessageHandlerPostAsyncTests
     {
-        [TestCase]
+        [Fact]
         public async Task WithoutAuthentication()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -39,12 +41,11 @@ namespace Booth.PortfolioManager.RestApi.Test
             };
             await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
 
-            Assert.That(requestMessage.Method, Is.EqualTo(HttpMethod.Post));
-            Assert.That(requestMessage.RequestUri, Is.EqualTo(new Uri("http://test.com.au/api/v2/authtest")));
-            Assert.That(requestMessage.Headers.Contains("Authorisation"), Is.False);
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/v2/authtest") });
+            requestMessage.Headers.Should().NotContain("Authorisation");
         }
 
-        [TestCase]
+        [Fact]
         public async Task WithAuthentication()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -63,13 +64,11 @@ namespace Booth.PortfolioManager.RestApi.Test
             };
             await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
 
-            Assert.That(requestMessage.Method, Is.EqualTo(HttpMethod.Post));
-            Assert.That(requestMessage.RequestUri, Is.EqualTo(new Uri("http://test.com.au/api/v2/authtest")));
-            Assert.That(requestMessage.Headers.Authorization.Scheme, Is.EqualTo("Bearer"));
-            Assert.That(requestMessage.Headers.Authorization.Parameter, Is.EqualTo("DummyToken"));
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/v2/authtest") });
+            requestMessage.Headers.Authorization.Should().BeEquivalentTo(new { Scheme = "Bearer", Parameter = "DummyToken" });
         }
 
-        [TestCase]
+        [Fact]
         public void AuthenticationFailed()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -85,11 +84,11 @@ namespace Booth.PortfolioManager.RestApi.Test
             {
                 Field = "test"
             };
-            Assert.That(async () => await messageHandler.PostAsync<SingleValueTestData>("authtest", data), 
-                Throws.TypeOf<RestException>().With.Property("StatusCode").EqualTo(HttpStatusCode.Forbidden));
+            Func<Task> action = async () => await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
+            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.Forbidden);
         }
 
-        [TestCase]
+        [Fact]
         public void NotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -105,11 +104,11 @@ namespace Booth.PortfolioManager.RestApi.Test
             {
                 Field = "test"
             };
-            Assert.That(async () => await messageHandler.PostAsync<SingleValueTestData>("authtest", data),
-                Throws.TypeOf<RestException>().With.Property("StatusCode").EqualTo(HttpStatusCode.NotFound));
+            Func<Task> action = async () => await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
+            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.NotFound);
         }
 
-        [TestCase]
+        [Fact]
         public async Task SerializeObjectWhenSending()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -128,12 +127,12 @@ namespace Booth.PortfolioManager.RestApi.Test
             };
             await messageHandler.PostAsync<SingleValueTestData>("standardtypes", data);
 
-            Assert.That(requestMessage.Content.Headers.ContentType.MediaType, Is.EqualTo("application/json"));
+            requestMessage.Content.Headers.ContentType.MediaType.Should().Be("application/json");
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public async Task SerializeObjectWhenReceiving()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -152,16 +151,12 @@ namespace Booth.PortfolioManager.RestApi.Test
             };
             var result = await messageHandler.PostAsync<StandardTypesTestData, SingleValueTestData>("standardtypes", data);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Integer, Is.EqualTo(5));
-                Assert.That(result.String, Is.EqualTo("World"));
-            });
+            result.Should().BeEquivalentTo(new { Integer = 5, String = "World"});
 
 
             mockRepository.Verify();
         }
-
+        
     }
 
 }

@@ -3,27 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
+using Booth.Common;
 using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Transactions;
 
 
 namespace Booth.PortfolioManager.RestApi.Test.Transactions
 {
-    class TransactionResourceTests
+    public class TransactionResourceTests
     {
        
-        [GenericTestCaseSource(nameof(TransactionTypesData))]
-        public async Task GetTransaction<T>() where T : Transaction, new()
+        [Theory]
+        [MemberData(nameof(TransactionTypesData))]
+        public async Task GetTransaction(Transaction transaction)
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolioId = Guid.NewGuid();
 
             var transactionId = Guid.NewGuid();
-            var transaction = new T() { Id = transactionId };
+            transaction.Id = transactionId;
 
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
@@ -35,27 +38,27 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var result = await resource.Get(transactionId);
 
-            Assert.That(result, Is.TypeOf<T>());
-            Assert.That(result.Id, Is.EqualTo(transactionId));
-
+            result.Should().BeOfType(transaction.GetType()).And.BeEquivalentTo(new { Id = transactionId});
+            
             mockRepository.Verify();
         }
 
-        [GenericTestCaseSource(nameof(TransactionTypesData))]
-        public async Task AddTransaction<T>() where T : Transaction, new()
+        [Theory]
+        [MemberData(nameof(TransactionTypesData))]
+        public async Task AddTransaction(Transaction transaction)
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolioId = Guid.NewGuid();
 
             var transactionId = Guid.NewGuid();
-            var transaction = new T() { Id = transactionId };
+            transaction.Id = transactionId;
 
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
             messageHandler.Setup(x => x.PostAsync<Transaction>(
                 It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions"),
-                It.Is<Transaction>(x => x.GetType() == typeof(T) &&  x.Id == transactionId))) 
+                It.Is<Transaction>(x => x.GetType() == transaction.GetType() &&  x.Id == transactionId))) 
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
@@ -67,7 +70,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
         }
 
 
-        [TestCase]
+        [Fact]
         public async Task AddMultipleTransaction()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -75,13 +78,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             var portfolioId = Guid.NewGuid();
 
             var transactions = new List<Transaction>();
-
-            foreach (var transactionTypeData in TransactionTypesData())
-            {
-                var transactionType = transactionTypeData.Arguments[0] as Type;
-                var transaction = Activator.CreateInstance(transactionType) as Transaction;
-                transactions.Add(transaction);
-            }
+            transactions.AddRange(TransactionTypesData().Select(x => (Transaction)x[0]));
 
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
@@ -98,10 +95,13 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             mockRepository.Verify();
         } 
 
-
-        static IEnumerable<TestCaseData> TransactionTypesData()
+        public static IEnumerable<object[]> TransactionTypesData()
         {
-            yield return new TestCaseData(typeof(Aquisition));
+            var transactionTypes = TypeUtils.GetSubclassesOf(typeof(Transaction), true);
+
+            return transactionTypes.Select(x => new object[] { Activator.CreateInstance(x) });
         }
     }
+
+    
 }

@@ -7,7 +7,8 @@ using System.Net;
 using System.Net.Http;
 using System.IO;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -17,9 +18,9 @@ using Booth.PortfolioManager.RestApi.Test.Serialization;
 
 namespace Booth.PortfolioManager.RestApi.Test
 {
-    class RestClientMessageHandlerGetAsyncTests
+    public class RestClientMessageHandlerGetAsyncTests
     {
-        [TestCase]
+        [Fact]
         public async Task WithoutAuthentication()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -33,12 +34,12 @@ namespace Booth.PortfolioManager.RestApi.Test
 
             var result = await messageHandler.GetAsync<Time>("authtest");
 
-            Assert.That(requestMessage.Method, Is.EqualTo(HttpMethod.Get));
-            Assert.That(requestMessage.RequestUri, Is.EqualTo(new Uri("http://test.com.au/api/v2/authtest")));
-            Assert.That(requestMessage.Headers.Contains("Authorisation"), Is.False);
-        }
 
-        [TestCase]
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Get, RequestUri = new Uri("http://test.com.au/api/v2/authtest") });
+            requestMessage.Headers.Should().NotContain("Authorisation");
+        }
+        
+        [Fact]
         public async Task WithAuthentication()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -53,13 +54,11 @@ namespace Booth.PortfolioManager.RestApi.Test
 
             var result = await messageHandler.GetAsync<Time>("authtest");
 
-            Assert.That(requestMessage.Method, Is.EqualTo(HttpMethod.Get));
-            Assert.That(requestMessage.RequestUri, Is.EqualTo(new Uri("http://test.com.au/api/v2/authtest")));
-            Assert.That(requestMessage.Headers.Authorization.Scheme, Is.EqualTo("Bearer"));
-            Assert.That(requestMessage.Headers.Authorization.Parameter, Is.EqualTo("DummyToken"));
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Get, RequestUri = new Uri("http://test.com.au/api/v2/authtest") });
+            requestMessage.Headers.Authorization.Should().BeEquivalentTo(new { Scheme = "Bearer", Parameter = "DummyToken" });
         }
-
-        [TestCase]
+        
+        [Fact]
         public void AuthenticationFailed()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -70,11 +69,11 @@ namespace Booth.PortfolioManager.RestApi.Test
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
-            Assert.That(async() => await messageHandler.GetAsync<SingleValueTestData>("authtest"),
-                Throws.TypeOf<RestException>().With.Property("StatusCode").EqualTo(HttpStatusCode.Forbidden));
+            Func<Task> action = async() => await messageHandler.GetAsync<SingleValueTestData>("authtest");
+            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.Forbidden);
         }
-
-        [TestCase]
+        
+        [Fact]
         public void NotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -85,11 +84,11 @@ namespace Booth.PortfolioManager.RestApi.Test
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
-            Assert.That(async () => await messageHandler.GetAsync<SingleValueTestData>("authtest"), 
-                Throws.TypeOf<RestException>().With.Property("StatusCode").EqualTo(HttpStatusCode.NotFound));
+            Func<Task> action = async () => await messageHandler.GetAsync<SingleValueTestData>("authtest");
+            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.NotFound);
         }
 
-        [TestCase]
+        [Fact]
         public async Task SerializeObjectWhenReceiving()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -103,10 +102,10 @@ namespace Booth.PortfolioManager.RestApi.Test
 
             var data = await messageHandler.GetAsync<SingleValueTestData>("standardtypes");
 
-            Assert.That(data.Field, Is.EqualTo("Hello"));
+            data.Field.Should().Be("Hello");
 
             mockRepository.Verify();
-        }
+        }  
     }
 
 }

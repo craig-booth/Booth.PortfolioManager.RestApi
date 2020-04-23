@@ -5,40 +5,56 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
+using Booth.Common;
 using Booth.PortfolioManager.RestApi.Transactions;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Booth.PortfolioManager.RestApi.Serialization
 {
     class TransactionConverter : JsonConverter
     {
+        private Dictionary<string, Type> _TransactionTypes = new Dictionary<string, Type>();
+        public TransactionConverter()
+        {
+            foreach (var transactionType in TypeUtils.GetSubclassesOf(typeof(Transaction), true))
+            {
+                var transaction = Activator.CreateInstance(transactionType) as Transaction;
+                _TransactionTypes.Add(transaction.Type, transactionType);
+            }
+        }
+
         public override bool CanConvert(Type objectType)
         {
-            return (objectType.IsSubclassOf(typeof(Transaction)));
+            return (objectType == typeof(Transaction));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var transaction = new Aquisition();
+            var jObject = JToken.ReadFrom(reader) as JObject;
+
+            if (!jObject.TryGetValue("type", out var jToken))
+                throw new JsonReaderException("Type field is missing. Unable to determine the type of the transaction");
+            
+            var type = jToken.ToString();
+            if (!_TransactionTypes.TryGetValue(type, out var transactionType))
+                throw new JsonReaderException("Type field is invalid. Unable to determine the type of the transaction");
+
+            var transaction = Activator.CreateInstance(transactionType);
+
+            serializer.Populate(jObject.CreateReader(), transaction);
 
             return transaction;
         }
 
         public override bool CanWrite
         {
-            get { return true; }
+            get { return false; }
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            serializer.TypeNameHandling = TypeNameHandling.Objects;
-            var transaction = value as Transaction;
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("id");
-            writer.WriteValue(transaction.Id);
-
-            writer.WriteEndObject();
+            throw new NotImplementedException();
         }
 
     }

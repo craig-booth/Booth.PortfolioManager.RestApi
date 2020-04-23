@@ -2,20 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Booth.Common;
 
 namespace Booth.PortfolioManager.RestApi.Transactions
 {
-  /*  public interface ITransaction
-    {
-        string Type { get; }
-    } */
 
     public abstract class Transaction
     {
         public Guid Id { get; set; }
         public abstract string Type { get; }
         public Guid Stock { get; set; }
-        public DateTime TransactionDate { get; set; }
+        public Date TransactionDate { get; set; }
         public string Comment { get; set; }
         public string Description { get; set; }
     }
@@ -54,28 +51,7 @@ namespace Booth.PortfolioManager.RestApi.Transactions
                 throw new IndexOutOfRangeException();
         }
 
-        public static string ToRestName(this TransactionType transactionType)
-        {
-            if (transactionType == TransactionType.Aquisition)
-                return "aquisition";
-            else if (transactionType == TransactionType.Disposal)
-                return "disposal";
-            else if (transactionType == TransactionType.CostBaseAdjustment)
-                return "costbaseadjustment";
-            else if (transactionType == TransactionType.OpeningBalance)
-                return "openingbalance";
-            else if (transactionType == TransactionType.ReturnOfCapital)
-                return "returnofcapital";
-            else if (transactionType == TransactionType.Income)
-                return "incomereceived";
-            else if (transactionType == TransactionType.UnitCountAdjustment)
-                return "unitcountadjustment";
-            else if (transactionType == TransactionType.CashTransaction)
-                return "cashtransaction";
-            else
-                return "";
-        }
-
+       
         public static TransactionType ToTransactionType(string transactionType)
         {
             if (transactionType == "aquisition")

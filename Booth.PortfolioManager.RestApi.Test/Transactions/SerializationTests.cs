@@ -1,15 +1,59 @@
 ﻿using System;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
+using Booth.Common;
 using Booth.PortfolioManager.RestApi.Transactions;
 using Booth.PortfolioManager.RestApi.Serialization;
 
 namespace Booth.PortfolioManager.RestApi.Test.Transactions
 {
-    class SerializationTests
+    public class SerializationTests
     {
-        [TestCase]
+    
+        [Fact]
+        public void DeserializeTypePropertyMissing()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                            + "\"stock\":\"" + stockId + "\","
+                            + "\"transactionDate\":\"2000-01-10\","
+                            + "\"comment\":\"comment\","
+                            + "\"description\":\"description\"}";
+
+            
+            Action a = () => serializer.Deserialize<Transaction>(json);
+            a.Should().ThrowExactly<JsonReaderException>();
+        }
+
+        [Fact]
+        public void DeserializeTypePropertyIncorrectValue()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                            + "\"stock\":\"" + stockId + "\","
+                            + "\"type\":\"xxx\","
+                            + "\"transactionDate\":\"2000-01-10\","
+                            + "\"comment\":\"comment\","
+                            + "\"description\":\"description\"}";
+
+            Action a = () => serializer.Deserialize<Transaction>(json);
+            a.Should().ThrowExactly<JsonReaderException>();
+        }
+
+        [Fact]
         public void SerializeAquisition()
         {
             var serializer = new RestClientSerializer();
@@ -20,7 +64,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             {
                 Id = transactionId,
                 Stock = stockId,
-                TransactionDate = new DateTime(2000, 01, 10),
+                TransactionDate = new Date(2000, 01, 10),
                 Comment = "comment",
                 Description = "description",
                 Units = 100,
@@ -29,9 +73,31 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 CreateCashTransaction = true
             };
 
-            var json = serializer.Serialize(transaction);
+            var json = JToken.Parse(serializer.Serialize(transaction));
 
-            var expectedJson = "{\"id\":\"" + transactionId + "\","
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"aquisition\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"units\":100,"
+                             + "\"averagePrice\":12.00,"
+                             + "\"transactionCosts\":19.95,"
+                             + "\"createCashTransaction\":true}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeAquisition()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
                              + "\"type\":\"aquisition\","
                              + "\"transactionDate\":\"2000-01-10\","
@@ -42,11 +108,58 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                              + "\"transactionCosts\":\"19.95\","
                              + "\"createCashTransaction\":\"true\"}";
 
-            Assert.That(json, Is.EqualTo(expectedJson));
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new Aquisition()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                Units = 100,
+                AveragePrice = 12.00m,
+                TransactionCosts = 19.95m,
+                CreateCashTransaction = true
+            };
+
+            transaction.Should().BeEquivalentTo(expected);  
         }
 
-        [TestCase]
-        public void DeserializeAquisition()
+        [Fact]
+        public void SerializeCashTransaction()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new CashTransaction()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                CashTransactionType = "fee",
+                Amount = 15.00m
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"cashtransaction\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"cashTransactionType\":\"fee\","
+                             + "\"amount\":15.00}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeCashTransaction()
         {
             var serializer = new RestClientSerializer();
 
@@ -54,33 +167,458 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             var stockId = Guid.NewGuid();
 
             var json = "{\"id\":\"" + transactionId + "\","
-                             + "\"stock\":\"" + stockId + "\"}"
-                             + "\"type\":\"aquisition\""
-                             + "\"transactionDate\":\"2000-01-10\"}"
-                             + "\"comment\":\"comment\"}"
-                             + "\"description\":\"description\"}"
-                             + "\"units\":\"100\"}"
-                             + "\"averagePrice\":\"12.00\"}"
-                             + "\"transactionCosts\":\"19.95\"}"
-                             + "\"createCashTransaction\":\"true\"}";
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"cashtransaction\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"cashTransactionType\":\"fee\","
+                             + "\"amount\":15.00}";
 
             var transaction = serializer.Deserialize<Transaction>(json);
 
-            Assert.That(transaction, Is.TypeOf<Aquisition>());
-            var aquisition = transaction as Aquisition;
-            Assert.Multiple(() =>
+            var expected = new CashTransaction()
             {
-                Assert.That(aquisition.Id, Is.EqualTo(transactionId));
-                Assert.That(aquisition.Stock, Is.EqualTo(stockId));
-                Assert.That(aquisition.TransactionDate, Is.EqualTo(new DateTime(2000, 01, 10)));
-                Assert.That(aquisition.Comment, Is.EqualTo("comment"));
-                Assert.That(aquisition.Description, Is.EqualTo("description"));
-                Assert.That(aquisition.Units, Is.EqualTo(100));
-                Assert.That(aquisition.AveragePrice, Is.EqualTo(12.00m));
-                Assert.That(aquisition.TransactionCosts, Is.EqualTo(19.95m));
-                Assert.That(aquisition.CreateCashTransaction, Is.EqualTo(true));
-            });
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                CashTransactionType = "fee",
+                Amount = 15.00m
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
         }
 
-    }
+        [Fact]
+        public void SerializeCostBaseAdjustment()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new CostBaseAdjustment()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description", 
+                Percentage = 0.35m
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"costbaseadjustment\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"percentage\":0.35}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeCostBaseAdjustment()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"costbaseadjustment\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"percentage\":0.35}";
+
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new CostBaseAdjustment()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                Percentage = 0.35m
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void SerializeDisposal()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new Disposal()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                Units = 100,
+                AveragePrice = 12.45m,
+                TransactionCosts = 19.95m,
+                CGTMethod = "minimize",
+                CreateCashTransaction = true
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"disposal\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"units\":100,"
+                             + "\"averagePrice\":12.45,"
+                             + "\"transactionCosts\":19.95,"
+                             + "\"cgtMethod\":\"minimize\","
+                             + "\"createCashTransaction\":true}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeDisposal()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"disposal\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"units\":100,"
+                             + "\"averagePrice\":12.45,"
+                             + "\"transactionCosts\":19.95,"
+                             + "\"cgtMethod\":\"minimize\","
+                             + "\"createCashTransaction\":true}";
+
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new Disposal()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                Units = 100,
+                AveragePrice = 12.45m,
+                TransactionCosts = 19.95m,
+                CGTMethod = "minimize",
+                CreateCashTransaction = true
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void SerializeIncomeReceived()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new IncomeReceived()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                RecordDate = new Date(2000, 01, 02),
+                FrankedAmount = 10.00m,
+                UnfrankedAmount = 11.00m,
+                FrankingCredits = 3.00m,
+                Interest = 4.00m,
+                TaxDeferred = 7.00m,
+                DrpCashBalance = 9.00m,
+                CreateCashTransaction = true
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"incomereceived\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"recordDate\":\"2000-01-02\","
+                             + "\"frankedAmount\":10.00,"
+                             + "\"unfrankedAmount\":11.00,"
+                             + "\"frankingCredits\":3.00,"
+                             + "\"interest\":4.00,"
+                             + "\"taxDeferred\":7.00,"
+                             + "\"drpCashBalance\":9.00,"
+                             + "\"createCashTransaction\":true}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeIncomeReceived()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"incomereceived\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"recordDate\":\"2000-01-02\","
+                             + "\"frankedAmount\":10.00,"
+                             + "\"unfrankedAmount\":11.00,"
+                             + "\"frankingCredits\":3.00,"
+                             + "\"interest\":4.00,"
+                             + "\"taxDeferred\":7.00,"
+                             + "\"drpCashBalance\":9.00,"
+                             + "\"createCashTransaction\":true}";
+
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new IncomeReceived()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                RecordDate = new Date(2000, 01, 02),
+                FrankedAmount = 10.00m,
+                UnfrankedAmount = 11.00m,
+                FrankingCredits = 3.00m,
+                Interest = 4.00m,
+                TaxDeferred = 7.00m,
+                DrpCashBalance = 9.00m,
+                CreateCashTransaction = true
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void SerializeOpeningBalance()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new OpeningBalance()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                Units = 100,
+                CostBase = 1450.45m,
+                AquisitionDate = new Date(2000, 01, 01)
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"openingbalance\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"units\":100,"
+                             + "\"costBase\":1450.45,"
+                             + "\"aquisitionDate\":\"2000-01-01\"}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeOpeningBalance()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"openingbalance\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"units\":100,"
+                             + "\"costBase\":1450.45,"
+                             + "\"aquisitionDate\":\"2000-01-01\"}";
+
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new OpeningBalance()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                Units = 100,
+                CostBase = 1450.45m,
+                AquisitionDate = new Date(2000, 01, 01)
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void SerializeReturnOfCapital()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new ReturnOfCapital()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                RecordDate = new Date(2000, 01, 01),
+                Amount = 45.00m,
+                CreateCashTransaction = true
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"returnofcapital\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"recordDate\":\"2000-01-01\","
+                             + "\"amount\":45.00,"
+                             + "\"createCashTransaction\":true}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeReturnOfCapital()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"returnofcapital\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"recordDate\":\"2000-01-01\","
+                             + "\"amount\":45.00,"
+                             + "\"createCashTransaction\":true}";
+
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new ReturnOfCapital()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                RecordDate = new Date(2000, 01, 01),
+                Amount = 45.00m,
+                CreateCashTransaction = true
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void SerializeUnitCountAdjustment()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var transaction = new UnitCountAdjustment()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                OriginalUnits = 1,
+                NewUnits = 2
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transaction));
+
+            var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"unitcountadjustment\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"originalUnits\":1,"
+                             + "\"newUnits\":2}");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeUnitCountAdjustment()
+        {
+            var serializer = new RestClientSerializer();
+
+            var transactionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var json = "{\"id\":\"" + transactionId + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"unitcountadjustment\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"originalUnits\":1,"
+                             + "\"newUnits\":2}";
+
+            var transaction = serializer.Deserialize<Transaction>(json);
+
+            var expected = new UnitCountAdjustment()
+            {
+                Id = transactionId,
+                Stock = stockId,
+                TransactionDate = new Date(2000, 01, 10),
+                Comment = "comment",
+                Description = "description",
+                OriginalUnits = 1,
+                NewUnits = 2
+            };
+
+            transaction.Should().BeEquivalentTo(expected);
+        }
+    } 
 }

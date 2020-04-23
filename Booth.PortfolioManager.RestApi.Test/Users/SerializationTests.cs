@@ -1,6 +1,9 @@
 ﻿using System;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Json;
+using Newtonsoft.Json.Linq;
 
 using Booth.PortfolioManager.RestApi.Users;
 using Booth.PortfolioManager.RestApi.Serialization;
@@ -9,9 +12,9 @@ using Booth.PortfolioManager.RestApi.Serialization;
 namespace Booth.PortfolioManager.RestApi.Test.Users
 {
 
-    class SerializationTests
+    public class SerializationTests
     {
-        [TestCase]
+        [Fact]
         public void SerializeAuthenticationRequest()
         {
             var serializer = new RestClientSerializer();
@@ -22,14 +25,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
                 Password = "secret"
             };
 
-            var json = serializer.Serialize(request);
+            var json = JToken.Parse(serializer.Serialize(request));
 
-            var expectedJson = "{\"userName\":\"JoeBlogs\",\"password\":\"secret\"}";
+            var expectedJson = JToken.Parse("{\"userName\":\"JoeBlogs\",\"password\":\"secret\"}");
 
-            Assert.That(json, Is.EqualTo(expectedJson));
+            json.Should().BeEquivalentTo(expectedJson);
         }
-
-        [TestCase]
+        
+        [Fact]
         public void DeserializeAuthenticationRequest()
         {
             var serializer = new RestClientSerializer();
@@ -38,14 +41,10 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
 
             var request = serializer.Deserialize<AuthenticationRequest>(json);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(request.UserName, Is.EqualTo("JoeBlogs"));
-                Assert.That(request.Password, Is.EqualTo("secret"));
-            });
+            request.Should().BeEquivalentTo(new AuthenticationRequest() { UserName = "JoeBlogs", Password = "secret" });
         }
 
-        [TestCase]
+        [Fact]
         public void SerializeAuthenticationResponse()
         {
             var serializer = new RestClientSerializer();
@@ -55,14 +54,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
                 Token = "tokendata"
             };
 
-            var json = serializer.Serialize(response);
+            var json = JToken.Parse(serializer.Serialize(response));
 
-            var expectedJson = "{\"token\":\"tokendata\"}";
+            var expectedJson = JToken.Parse("{\"token\":\"tokendata\"}");
 
-            Assert.That(json, Is.EqualTo(expectedJson));
+            json.Should().BeEquivalentTo(expectedJson);
         }
 
-        [TestCase]
+        [Fact]
         public void DeserializeAuthenticationResponse()
         {
             var serializer = new RestClientSerializer();
@@ -71,10 +70,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
 
             var response = serializer.Deserialize<AuthenticationResponse>(json);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(response.Token, Is.EqualTo("tokendata"));
-            });
-        }
+            response.Should().BeEquivalentTo(new AuthenticationResponse() { Token = "tokendata" });
+        } 
     }
 }

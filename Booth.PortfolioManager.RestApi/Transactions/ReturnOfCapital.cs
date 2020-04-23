@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Booth.Common;
+
 namespace Booth.PortfolioManager.RestApi.Transactions
 {
-  /*  public class ReturnOfCapital : Transaction
+    public class ReturnOfCapital : Transaction
     {
-        public override string Type => TransactionType.ReturnOfCapital.ToRestName();
-        public DateTime RecordDate { get; set; }
+        public override string Type => "returnofcapital";
+        public Date RecordDate { get; set; }
         public decimal Amount { get; set; }
         public bool CreateCashTransaction { get; set; }
-    } */
+    } 
 }

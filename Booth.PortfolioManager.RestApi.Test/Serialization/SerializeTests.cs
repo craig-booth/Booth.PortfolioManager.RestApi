@@ -3,16 +3,19 @@ using System.Text;
 using System.Collections.Generic;
 using System.IO;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Json;
+using Newtonsoft.Json.Linq;
 
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Serialization;
 
 namespace Booth.PortfolioManager.RestApi.Test.Serialization
 {
-    class SerializeTests
+    public class SerializeTests
     {
-        [TestCase]
+        [Fact]
         public void StandardTypes()
         {
             var serializer = new RestClientSerializer();
@@ -24,15 +27,15 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
                 Decimal = 123.45m,
                 DateTime = new DateTime(2004, 02, 03, 14, 22, 04)
             };
-            var result = serializer.Serialize<StandardTypesTestData>(obj);
+            var result = JToken.Parse(serializer.Serialize<StandardTypesTestData>(obj));
           
-            var expectedJson = "{\"integer\":5,\"string\":\"Hello\",\"decimal\":123.45,\"dateTime\":\"2004-02-03T14:22:04\"}";
+            var expectedJson = JToken.Parse("{\"integer\":5,\"string\":\"Hello\",\"decimal\":123.45,\"dateTime\":\"2004-02-03T14:22:04\"}");
 
-            Assert.That(result, Is.EqualTo(expectedJson));
+            result.Should().BeEquivalentTo(expectedJson);
         }
 
 
-        [TestCase]
+        [Fact]
         public void DateType()
         {
             var serializer = new RestClientSerializer();
@@ -41,14 +44,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             {
                 Date = new Date(2004, 01, 02)
             };
-            var result = serializer.Serialize<DateTestData>(obj);
+            var result = JToken.Parse(serializer.Serialize<DateTestData>(obj));
 
-            var expectedJson = "{\"date\":\"2004-01-02\"}";
+            var expectedJson = JToken.Parse("{\"date\":\"2004-01-02\"}");
 
-            Assert.That(result, Is.EqualTo(expectedJson));
+            result.Should().BeEquivalentTo(expectedJson);
         }
 
-        [TestCase]
+        [Fact]
         public void TimeType()
         {
             var serializer = new RestClientSerializer();
@@ -57,14 +60,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             {
                 Time = new Time(13, 45, 01)
             };
-            var result = serializer.Serialize<TimeTestData>(obj);
+            var result = JToken.Parse(serializer.Serialize<TimeTestData>(obj));
 
-            var expectedJson = "{\"time\":\"13:45:01\"}";
+            var expectedJson = JToken.Parse("{\"time\":\"13:45:01\"}");
 
-            Assert.That(result, Is.EqualTo(expectedJson));
+            result.Should().BeEquivalentTo(expectedJson);
         }
 
-        [TestCase]
+        [Fact]
         public void NullValue()
         {
             var serializer = new RestClientSerializer();
@@ -76,14 +79,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
                 Decimal = 123.45m,
                 DateTime = new DateTime(2004, 02, 03, 14, 22, 04)
             };
-            var result = serializer.Serialize<StandardTypesTestData>(obj);
+            var result = JToken.Parse(serializer.Serialize<StandardTypesTestData>(obj));
 
-            var expectedJson = "{\"integer\":5,\"decimal\":123.45,\"dateTime\":\"2004-02-03T14:22:04\"}";
+            var expectedJson = JToken.Parse("{\"integer\":5,\"decimal\":123.45,\"dateTime\":\"2004-02-03T14:22:04\"}");
 
-            Assert.That(result, Is.EqualTo(expectedJson));
+            result.Should().BeEquivalentTo(expectedJson);
         }
 
-        [TestCase]
+        [Fact]
         public void SerializeUntypedToStream()
         {
             var serializer = new RestClientSerializer();
@@ -95,13 +98,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             };
             serializer.Serialize(stream, obj);
 
-            var expectedJson = "{\"field\":\"Hello\"}";
+            var expectedJson = JToken.Parse("{\"field\":\"Hello\"}");
 
-            var result = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.That(result, Is.EqualTo(expectedJson));
+            var result = JToken.Parse(Encoding.UTF8.GetString(stream.ToArray()));
+
+            result.Should().BeEquivalentTo(expectedJson);
         }
 
-        [TestCase]
+        [Fact]
         public void SerializeTypedToStream()
         {
             var serializer = new RestClientSerializer();
@@ -113,12 +117,13 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             };
             serializer.Serialize<SingleValueTestData>(stream, obj);
 
-            var expectedJson = "{\"field\":\"Hello\"}";
+            var expectedJson = JToken.Parse("{\"field\":\"Hello\"}");
 
-            var result = Encoding.UTF8.GetString(stream.ToArray());
-            Assert.That(result, Is.EqualTo(expectedJson));
+            var result = JToken.Parse(Encoding.UTF8.GetString(stream.ToArray()));
+
+            result.Should().BeEquivalentTo(expectedJson);
         }
-
+        
     }
 
 }
