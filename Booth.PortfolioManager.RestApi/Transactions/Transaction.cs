@@ -7,10 +7,11 @@ using Booth.Common;
 namespace Booth.PortfolioManager.RestApi.Transactions
 {
 
+    public enum TransactionType { Aquisition, CashTransaction, CostBaseAdjustment, Disposal, IncomeReceived, OpeningBalance, ReturnOfCapital, UnitCountAdjustment }
     public abstract class Transaction
     {
         public Guid Id { get; set; }
-        public abstract string Type { get; }
+        public abstract TransactionType Type { get; }
         public Guid Stock { get; set; }
         public Date TransactionDate { get; set; }
         public string Comment { get; set; }

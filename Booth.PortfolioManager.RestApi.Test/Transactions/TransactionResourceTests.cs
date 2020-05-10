@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 {
     public class TransactionResourceTests
     {
-       
+
         [Theory]
         [MemberData(nameof(TransactionTypesData))]
         public async Task GetTransaction(Transaction transaction)
@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
-            messageHandler.Setup(x => x.GetAsync<Transaction>(It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions/" + transactionId)))
+            messageHandler.Setup(x => x.GetAsync<Transaction>(It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions/" + transactionId)))
                 .Returns(Task<Transaction>.FromResult(transaction as Transaction))
                 .Verifiable();
 
@@ -38,8 +38,8 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var result = await resource.Get(transactionId);
 
-            result.Should().BeOfType(transaction.GetType()).And.BeEquivalentTo(new { Id = transactionId});
-            
+            result.Should().BeOfType(transaction.GetType()).And.BeEquivalentTo(new { Id = transactionId });
+
             mockRepository.Verify();
         }
 
@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
             messageHandler.Setup(x => x.PostAsync<Transaction>(
-                It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions"),
+                It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions"),
                 It.Is<Transaction>(x => x.GetType() == transaction.GetType() &&  x.Id == transactionId))) 
                 .Returns(Task.CompletedTask)
                 .Verifiable();
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
             messageHandler.Setup(x => x.PostAsync<IEnumerable<Transaction>>(
-                It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions"),
+                It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions"),
                 It.Is<IEnumerable<Transaction>>(x => x.Count() == transactions.Count)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
@@ -93,7 +93,38 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             await resource.Add(transactions);
 
             mockRepository.Verify();
-        } 
+        }
+
+        [Fact]
+        public async Task GetTransactionsForCorporateAction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolioId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+            var corporateActionId = Guid.NewGuid();
+
+            var transactions = new List<Transaction>()
+            {
+                new OpeningBalance() {  Id = Guid.NewGuid(), Units = 10 },
+                new ReturnOfCapital() {  Id = Guid.NewGuid(), Amount = 50.45m },
+            };
+
+            var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
+            messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
+            messageHandler.Setup(x => x.GetAsync<List<Transaction>>(It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions/" + stockId + "/corporateactions/" + corporateActionId)))
+                .Returns(Task<List<Transaction>>.FromResult(transactions))
+                .Verifiable();
+
+            var resource = new TransactionResource(messageHandler.Object);
+
+            var result = await resource.GetTransactionsForCorporateAction(stockId, corporateActionId);
+
+            result.Should().BeEquivalentTo(transactions);
+
+            mockRepository.Verify();
+        }
+
 
         public static IEnumerable<object[]> TransactionTypesData()
         {
@@ -101,7 +132,10 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             return transactionTypes.Select(x => new object[] { Activator.CreateInstance(x) });
         }
+
+        
+
     }
 
-    
+
 }

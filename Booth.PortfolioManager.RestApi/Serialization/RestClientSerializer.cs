@@ -28,9 +28,11 @@ namespace Booth.PortfolioManager.RestApi.Serialization
 
             _Serializer.NullValueHandling = NullValueHandling.Ignore;
             _Serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            _Serializer.Converters.Add(new StringEnumConverter() { CamelCaseText = true });
             _Serializer.Converters.Add(new DateJsonConverter());
             _Serializer.Converters.Add(new TimeJsonConverter());
             _Serializer.Converters.Add(new TransactionConverter());
+            _Serializer.Converters.Add(new CorporateActionConverter());
         }
 
         public T Deserialize<T>(string source)

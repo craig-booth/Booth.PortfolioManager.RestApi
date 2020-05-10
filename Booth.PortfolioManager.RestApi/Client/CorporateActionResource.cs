@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Booth.Common;
+using Booth.PortfolioManager.RestApi.CorporateActions;
+
 namespace Booth.PortfolioManager.RestApi.Client
 {
     public class CorporateActionResource
@@ -12,25 +15,25 @@ namespace Booth.PortfolioManager.RestApi.Client
         {
             _MessageHandler = messageHandler;
         }
-/*
-        public async Task<IEnumerable<CorporateAction>> GetAll(Guid stockid)
+
+        public async Task<List<CorporateAction>> GetAll(Guid stockId)
         {
-            return await GetAsync<IEnumerable<CorporateAction>>("/api/v2/stocks/" + stockid + "/corporateactions");
+            return await _MessageHandler.GetAsync<List<CorporateAction>>("stocks/" + stockId + "/corporateactions");
         }
 
-        public async Task<IEnumerable<CorporateAction>> GetAll(Guid stockid, DateRange dateRange)
+        public async Task<List<CorporateAction>> GetAll(Guid stockId, DateRange dateRange)
         {
-            return await GetAsync<IEnumerable<CorporateAction>>("/api/v2/stocks/" + stockid + "/corporateactions?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
+            return await _MessageHandler.GetAsync<List<CorporateAction>>("stocks/" + stockId + "/corporateactions?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
         }
 
-        public async Task<CorporateAction> Get(Guid stockid, Guid id)
+        public async Task<CorporateAction> Get(Guid stockId, Guid id)
         {
-            return await GetAsync<CorporateAction>("/api/v2/stocks/" + stockid + "/corporateactions/" + id);
+            return await _MessageHandler.GetAsync<CorporateAction>("stocks/" + stockId + "/corporateactions/" + id);
         }
 
-        public async Task Add(Guid stockid, CorporateAction corporateAction)
+        public async Task Add(Guid stockId, CorporateAction corporateAction)
         {
-            await PostAsync<CorporateAction>("/api/v2/stocks/" + stockid + "/corporateactions/", corporateAction);
-        } */
+            await _MessageHandler.PostAsync<CorporateAction>("stocks/" + stockId + "/corporateactions", corporateAction);
+        } 
     }
 }

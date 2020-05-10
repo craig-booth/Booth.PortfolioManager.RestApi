@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.RestApi.Transactions
 {
     public class IncomeReceived : Transaction
     {
-        public override string Type => "incomereceived";
+        public override TransactionType Type => TransactionType.IncomeReceived;
         public Date RecordDate { get; set; }
         public decimal FrankedAmount { get; set; }
         public decimal UnfrankedAmount { get; set; }

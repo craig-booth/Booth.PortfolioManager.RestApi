@@ -6,7 +6,7 @@ namespace Booth.PortfolioManager.RestApi.Transactions
 {
     public class CostBaseAdjustment : Transaction
     {
-        public override string Type => "costbaseadjustment";
+        public override TransactionType Type => TransactionType.CostBaseAdjustment;
         public decimal Percentage { get; set; }
     } 
 }

@@ -7,7 +7,7 @@ namespace Booth.PortfolioManager.RestApi.Transactions
 {
     public class UnitCountAdjustment : Transaction
     {
-        public override string Type => "unitcountadjustment";
+        public override TransactionType Type => TransactionType.UnitCountAdjustment;
         public int OriginalUnits { get; set; }
         public int NewUnits { get; set; }
     } 

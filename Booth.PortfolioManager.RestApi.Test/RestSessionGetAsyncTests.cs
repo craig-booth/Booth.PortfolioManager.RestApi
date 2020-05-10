@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             messageHandler.JwtToken = "DummyToken";
 
             Func<Task> action = async() => await messageHandler.GetAsync<SingleValueTestData>("authtest");
-            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.Forbidden);
+            action.Should().ThrowExactly<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
         
         [Fact]
@@ -85,7 +85,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             messageHandler.JwtToken = "DummyToken";
 
             Func<Task> action = async () => await messageHandler.GetAsync<SingleValueTestData>("authtest");
-            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.NotFound);
+            action.Should().ThrowExactly<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]

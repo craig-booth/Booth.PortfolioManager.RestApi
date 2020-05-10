@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.RestApi.Transactions
 {
     public class ReturnOfCapital : Transaction
     {
-        public override string Type => "returnofcapital";
+        public override TransactionType Type => TransactionType.ReturnOfCapital;
         public Date RecordDate { get; set; }
         public decimal Amount { get; set; }
         public bool CreateCashTransaction { get; set; }

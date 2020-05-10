@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.RestApi.Client
     {
         public RestClientMessageHandler MessageHandler { get; private set; }   
         public StockResource Stocks { get; }
-        public TradingCalanderResource TradingCalander { get; }
+        public TradingCalandarResource TradingCalander { get; }
         public CorporateActionResource CorporateActions { get; }
         public PortfolioResource Portfolio { get; }
         public HoldingResource Holdings { get; }
@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.RestApi.Client
             MessageHandler = new RestClientMessageHandler(baseURL, new RestClientSerializer());
 
             Stocks = new StockResource(MessageHandler);
-            TradingCalander = new TradingCalanderResource(MessageHandler);
+            TradingCalander = new TradingCalandarResource(MessageHandler);
             CorporateActions = new CorporateActionResource(MessageHandler);
             Portfolio = new PortfolioResource(MessageHandler);
             Holdings = new HoldingResource(MessageHandler);

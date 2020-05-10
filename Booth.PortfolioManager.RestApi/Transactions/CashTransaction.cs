@@ -5,10 +5,11 @@ using System.Text;
 
 namespace Booth.PortfolioManager.RestApi.Transactions
 {
+    public enum CashTransactionType { Deposit, Withdrawl, Transfer, Fee, Interest }
     public class CashTransaction : Transaction
     {
-        public override string Type => "cashtransaction";
-        public string CashTransactionType { get; set; }
+        public override TransactionType Type => TransactionType.CashTransaction;
+        public CashTransactionType CashTransactionType { get; set; }
         public decimal Amount { get; set; }
     } 
 }

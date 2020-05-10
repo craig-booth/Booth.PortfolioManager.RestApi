@@ -28,7 +28,7 @@ namespace Booth.PortfolioManager.RestApi.Serialization
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteValue(((Date)value).ToString("yyyy-MM-dd"));
+            writer.WriteValue(((Date)value).ToIsoDateString());
         }
     }
 }

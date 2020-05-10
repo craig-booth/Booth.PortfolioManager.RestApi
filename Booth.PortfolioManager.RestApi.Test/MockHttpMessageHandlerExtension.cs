@@ -12,7 +12,7 @@ using Moq.Protected;
 
 namespace Booth.PortfolioManager.RestApi.Test
 {
-    public static class MockHttpMessageHandleExtension
+    public static class MockHttpMessageHandlerExtension
     {
 
         public static Mock<HttpMessageHandler> CreateMessageHandler(this MockRepository mockRepository, HttpResponseMessage responseMessage)

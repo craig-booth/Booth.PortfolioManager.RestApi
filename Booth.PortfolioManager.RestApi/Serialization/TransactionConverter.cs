@@ -9,12 +9,13 @@ using Booth.Common;
 using Booth.PortfolioManager.RestApi.Transactions;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 
 namespace Booth.PortfolioManager.RestApi.Serialization
 {
     class TransactionConverter : JsonConverter
     {
-        private Dictionary<string, Type> _TransactionTypes = new Dictionary<string, Type>();
+        private Dictionary<TransactionType, Type> _TransactionTypes = new Dictionary<TransactionType, Type>();
         public TransactionConverter()
         {
             foreach (var transactionType in TypeUtils.GetSubclassesOf(typeof(Transaction), true))
@@ -35,12 +36,18 @@ namespace Booth.PortfolioManager.RestApi.Serialization
 
             if (!jObject.TryGetValue("type", out var jToken))
                 throw new JsonReaderException("Type field is missing. Unable to determine the type of the transaction");
-            
-            var type = jToken.ToString();
-            if (!_TransactionTypes.TryGetValue(type, out var transactionType))
-                throw new JsonReaderException("Type field is invalid. Unable to determine the type of the transaction");
 
-            var transaction = Activator.CreateInstance(transactionType);
+            TransactionType type;
+            try
+            {
+                type = jToken.ToObject<TransactionType>();
+            }
+            catch
+            {
+                throw new JsonReaderException("Type field is invalid. Unable to determine the type of the transaction");
+            }         
+
+            var transaction = Activator.CreateInstance(_TransactionTypes[type]);
 
             serializer.Populate(jObject.CreateReader(), transaction);
 

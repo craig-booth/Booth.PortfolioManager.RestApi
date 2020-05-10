@@ -8,14 +8,14 @@ using Moq;
 
 using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Users;
-
+using FluentAssertions;
 
 namespace Booth.PortfolioManager.RestApi.Test.Users
 {
    
-    class UserResourceTests
-    {/*
-        [TestCase]
+    public class UserResourceTests
+    {
+        [Fact]
         public async Task SuccessfullAuthentication()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             messageHandler.VerifySet(x => x.JwtToken = "valid");   
         }
 
-        [TestCase]
+        [Fact]
         public void FailedAuthentication()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -62,7 +62,8 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             password.AppendChar('e');
             password.AppendChar('t');
 
-            Assert.That(async() => await resource.Authenticate("JoeBlogs", password), Throws.TypeOf<RestException>());
+            Func<Task> a = async () => await resource.Authenticate("JoeBlogs", password);
+            a.Should().Throw<RestException>();
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "users/authenticate"),
@@ -70,7 +71,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             messageHandler.VerifySet(x => x.JwtToken = null);
         }
 
-        [TestCase]
+        [Fact]
         public async Task SuccessfullAuthenticateWhenAlreadyAuthenticated()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -98,7 +99,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             messageHandler.VerifySet(x => x.JwtToken = "valid");
         }
 
-        [TestCase]
+        [Fact]
         public void FailedAuthenticateWhenAlreadyAuthenticated()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -118,12 +119,13 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             password.AppendChar('e');
             password.AppendChar('t');
 
-            Assert.That(async () => await resource.Authenticate("JoeBlogs", password), Throws.TypeOf<RestException>());
+            Func<Task> a = async () => await resource.Authenticate("JoeBlogs", password);
+            a.Should().Throw<RestException>();
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "users/authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = null);     
-        } */
+        } 
     }
 }

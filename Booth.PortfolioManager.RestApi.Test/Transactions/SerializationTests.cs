@@ -140,7 +140,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 TransactionDate = new Date(2000, 01, 10),
                 Comment = "comment",
                 Description = "description",
-                CashTransactionType = "fee",
+                CashTransactionType = CashTransactionType.Fee,
                 Amount = 15.00m
             };
 
@@ -148,7 +148,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
-                             + "\"type\":\"cashtransaction\","
+                             + "\"type\":\"cashTransaction\","
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","
@@ -184,7 +184,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 TransactionDate = new Date(2000, 01, 10),
                 Comment = "comment",
                 Description = "description",
-                CashTransactionType = "fee",
+                CashTransactionType = CashTransactionType.Fee,
                 Amount = 15.00m
             };
 
@@ -212,7 +212,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
-                             + "\"type\":\"costbaseadjustment\","
+                             + "\"type\":\"costBaseAdjustment\","
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","
@@ -269,7 +269,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 Units = 100,
                 AveragePrice = 12.45m,
                 TransactionCosts = 19.95m,
-                CGTMethod = "minimize",
+                CgtMethod = CgtMethod.MinimizeGain,
                 CreateCashTransaction = true
             };
 
@@ -284,7 +284,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                              + "\"units\":100,"
                              + "\"averagePrice\":12.45,"
                              + "\"transactionCosts\":19.95,"
-                             + "\"cgtMethod\":\"minimize\","
+                             + "\"cgtMethod\":\"minimizeGain\","
                              + "\"createCashTransaction\":true}");
 
             json.Should().BeEquivalentTo(expectedJson);
@@ -307,7 +307,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                              + "\"units\":100,"
                              + "\"averagePrice\":12.45,"
                              + "\"transactionCosts\":19.95,"
-                             + "\"cgtMethod\":\"minimize\","
+                             + "\"cgtMethod\":\"minimizeGain\","
                              + "\"createCashTransaction\":true}";
 
             var transaction = serializer.Deserialize<Transaction>(json);
@@ -322,7 +322,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 Units = 100,
                 AveragePrice = 12.45m,
                 TransactionCosts = 19.95m,
-                CGTMethod = "minimize",
+                CgtMethod = CgtMethod.MinimizeGain,
                 CreateCashTransaction = true
             };
 
@@ -357,7 +357,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
-                             + "\"type\":\"incomereceived\","
+                             + "\"type\":\"incomeReceived\","
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","
@@ -441,7 +441,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
-                             + "\"type\":\"openingbalance\","
+                             + "\"type\":\"openingBalance\","
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","
@@ -510,7 +510,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
-                             + "\"type\":\"returnofcapital\","
+                             + "\"type\":\"returnOfCapital\","
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","
@@ -578,7 +578,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var expectedJson = JToken.Parse("{\"id\":\"" + transactionId + "\","
                              + "\"stock\":\"" + stockId + "\","
-                             + "\"type\":\"unitcountadjustment\","
+                             + "\"type\":\"unitCountAdjustment\","
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","

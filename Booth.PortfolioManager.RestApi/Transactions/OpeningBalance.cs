@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.RestApi.Transactions
 {
     public class OpeningBalance : Transaction
     {
-        public override string Type => "openingbalance";
+        public override TransactionType Type => TransactionType.OpeningBalance;
         public int Units { get; set; }
         public decimal CostBase { get; set; }
         public Date AquisitionDate { get; set; }

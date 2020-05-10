@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Booth.Common;
+using Booth.PortfolioManager.RestApi.Portfolios;
+
 namespace Booth.PortfolioManager.RestApi.Client
 {
 
@@ -13,69 +16,62 @@ namespace Booth.PortfolioManager.RestApi.Client
         {
             _MessageHandler = messageHandler;
         }
-/*
+
         public async Task<PortfolioPropertiesResponse> GetProperties()
         {
-            return await GetAsync<PortfolioPropertiesResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/properties");
+            return await _MessageHandler.GetAsync<PortfolioPropertiesResponse>("portfolio/" + _MessageHandler.Portfolio + "/properties");
         }
 
-        public async Task<PortfolioSummaryResponse> GetSummary(DateTime date)
+        public async Task<PortfolioSummaryResponse> GetSummary(Date date)
         {
-            return await GetAsync<PortfolioSummaryResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/summary?date=" + date.ToIsoDateString());
+            return await _MessageHandler.GetAsync<PortfolioSummaryResponse>("portfolio/" + _MessageHandler.Portfolio + "/summary?date=" + date.ToIsoDateString());
         }
 
         public async Task<PortfolioPerformanceResponse> GetPerformance(DateRange dateRange)
         {
-            return await GetAsync<PortfolioPerformanceResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/performance?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
+            return await _MessageHandler.GetAsync<PortfolioPerformanceResponse>("portfolio/" + _MessageHandler.Portfolio + "/performance?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
         }
 
         public async Task<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency)
         {
-            var url = "/api/v2/portfolio/" + _Session.Portfolio + "/value?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString();
+            var url = "portfolio/" + _MessageHandler.Portfolio + "/value?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString() + "&frequency=" + frequency.ToString().ToLower();
 
-            if (frequency == ValueFrequency.Weekly)
-                url += "&frequency=weekly";
-            else if (frequency == ValueFrequency.Monthly)
-                url += "&frequency=monthly";
-            else
-                url += "&frequency=daily";
-
-            return await GetAsync<PortfolioValueResponse>(url);
+            return await _MessageHandler.GetAsync<PortfolioValueResponse>(url);
         }
 
         public async Task<TransactionsResponse> GetTransactions(DateRange dateRange)
         {
-            return await GetAsync<TransactionsResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/transactions?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
+            return await _MessageHandler.GetAsync<TransactionsResponse>("portfolio/" + _MessageHandler.Portfolio + "/transactions?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
         }
 
-        public async Task<SimpleUnrealisedGainsResponse> GetCapitalGains(DateTime date)
+        public async Task<SimpleUnrealisedGainsResponse> GetCapitalGains(Date date)
         {
-            return await GetAsync<SimpleUnrealisedGainsResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/capitalgains?date=" + date.ToIsoDateString());
+            return await _MessageHandler.GetAsync<SimpleUnrealisedGainsResponse>("portfolio/" + _MessageHandler.Portfolio + "/capitalgains?date=" + date.ToIsoDateString());
         }
 
-        public async Task<DetailedUnrealisedGainsResponse> GetDetailedCapitalGains(DateTime date)
+        public async Task<DetailedUnrealisedGainsResponse> GetDetailedCapitalGains(Date date)
         {
-            return await GetAsync<DetailedUnrealisedGainsResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/detailedcapitalgains?date=" + date.ToIsoDateString());
+            return await _MessageHandler.GetAsync<DetailedUnrealisedGainsResponse>("portfolio/" + _MessageHandler.Portfolio + "/detailedcapitalgains?date=" + date.ToIsoDateString());
         }
 
         public async Task<CgtLiabilityResponse> GetCGTLiability(DateRange dateRange)
         {
-            return await GetAsync<CgtLiabilityResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/cgtliability?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
+            return await _MessageHandler.GetAsync<CgtLiabilityResponse>("portfolio/" + _MessageHandler.Portfolio + "/cgtliability?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
         }
 
         public async Task<CashAccountTransactionsResponse> GetCashAccount(DateRange dateRange)
         {
-            return await GetAsync<CashAccountTransactionsResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/cashaccount?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
+            return await _MessageHandler.GetAsync<CashAccountTransactionsResponse>("portfolio/" + _MessageHandler.Portfolio + "/cashaccount?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
         }
 
         public async Task<IncomeResponse> GetIncome(DateRange dateRange)
         {
-            return await GetAsync<IncomeResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/income?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
+            return await _MessageHandler.GetAsync<IncomeResponse>("portfolio/" + _MessageHandler.Portfolio + "/income?fromdate=" + dateRange.FromDate.ToIsoDateString() + "&todate=" + dateRange.ToDate.ToIsoDateString());
         }
 
         public async Task<CorporateActionsResponse> GetCorporateActions()
         {
-            return await GetAsync<CorporateActionsResponse>("/api/v2/portfolio/" + _Session.Portfolio + "/corporateactions");
-        } */
+            return await _MessageHandler.GetAsync<CorporateActionsResponse>("portfolio/" + _MessageHandler.Portfolio + "/corporateactions");
+        } 
     }
 }
