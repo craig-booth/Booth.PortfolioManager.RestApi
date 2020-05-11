@@ -2,8 +2,8 @@ pipeline {
     agent { docker 'mcr.microsoft.com/dotnet/core/sdk:3.0' }
 	
 	environment {
-		PROJECT      = './Booth.EventStore/Booth.PortfolioManager.RestApi.csproj'
-        TEST_PROJECT = './Booth.EventStore.Test/Booth.PortfolioManager.RestApi.Test.csproj'
+		PROJECT      = './Booth.PortfolioManager.RestApi/Booth.PortfolioManager.RestApi.csproj'
+        TEST_PROJECT = './Booth.PortfolioManager.RestApi.Test/Booth.PortfolioManager.RestApi.Test.csproj'
 
 		NUGET_KEY = credentials('nuget')
     }
