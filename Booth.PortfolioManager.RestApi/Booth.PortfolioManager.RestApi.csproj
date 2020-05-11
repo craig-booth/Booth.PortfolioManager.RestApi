@@ -1,12 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Craig Booth</Authors>
+    <Company />
+    <Product />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Booth.png</PackageIcon>
+    <Description>Client for accessing PortfolioManager's Rest API</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.8" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Booth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Booth.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
