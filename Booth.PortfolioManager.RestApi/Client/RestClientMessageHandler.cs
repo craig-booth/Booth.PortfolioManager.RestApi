@@ -45,22 +45,22 @@ namespace Booth.PortfolioManager.RestApi.Client
         private HttpClient _HttpClient { get; }
 
         public RestClientMessageHandler(string baseURL, IRestClientSerializer serializer)
-            : this(baseURL, new HttpClientHandler(), serializer)
+            : this(baseURL, new HttpClient(), serializer)
         {
             _JwtToken = null;
         }
 
-        public RestClientMessageHandler(string baseURL, HttpMessageHandler httpMessageHandler, IRestClientSerializer serializer)
+        public RestClientMessageHandler(string baseURL, HttpClient httpClient, IRestClientSerializer serializer)
         {
             BaseURL = baseURL;
 
-            _HttpClient = new HttpClient(httpMessageHandler);
+            _HttpClient = httpClient;
 
             _HttpClient.BaseAddress = new Uri(baseURL);
             _HttpClient.DefaultRequestHeaders.Accept.Clear();
             _HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            _Serializer = serializer; 
+            _Serializer = serializer;
         }
 
         public async Task<T> GetAsync<T>(string url)

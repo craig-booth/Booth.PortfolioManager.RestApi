@@ -24,15 +24,7 @@ namespace Booth.PortfolioManager.RestApi.Serialization
         private readonly JsonSerializer _Serializer;
         public RestClientSerializer()
         {
-            _Serializer = new JsonSerializer();
-
-            _Serializer.NullValueHandling = NullValueHandling.Ignore;
-            _Serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            _Serializer.Converters.Add(new StringEnumConverter() { CamelCaseText = true });
-            _Serializer.Converters.Add(new DateJsonConverter());
-            _Serializer.Converters.Add(new TimeJsonConverter());
-            _Serializer.Converters.Add(new TransactionConverter());
-            _Serializer.Converters.Add(new CorporateActionConverter());
+            _Serializer = JsonSerializer.Create(RestSerializerSettings.Settings);
         }
 
         public T Deserialize<T>(string source)
@@ -88,6 +80,27 @@ namespace Booth.PortfolioManager.RestApi.Serialization
             using (var streamWriter = new StreamWriter(stream))
             {
                 _Serializer.Serialize(streamWriter, obj, typeof(T));
+            }
+        }
+    }
+
+    public static class RestSerializerSettings
+    {
+        public static JsonSerializerSettings Settings
+        {
+            get
+            {
+                var settings = new JsonSerializerSettings();
+
+                settings.NullValueHandling = NullValueHandling.Ignore;
+                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                settings.Converters.Add(new StringEnumConverter() { CamelCaseText = true });
+                settings.Converters.Add(new DateJsonConverter());
+                settings.Converters.Add(new TimeJsonConverter());
+                settings.Converters.Add(new TransactionConverter());
+                settings.Converters.Add(new CorporateActionConverter());
+
+                return settings;
             }
         }
     }

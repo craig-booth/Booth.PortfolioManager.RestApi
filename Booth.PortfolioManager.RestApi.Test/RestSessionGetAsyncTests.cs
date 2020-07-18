@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Deserialize<Time>(It.IsAny<Stream>())).Returns(new Time());
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
 
             var result = await messageHandler.GetAsync<Time>("authtest");
 
@@ -49,7 +49,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Deserialize<Time>(It.IsAny<Stream>())).Returns(new Time());
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
             var result = await messageHandler.GetAsync<Time>("authtest");
@@ -66,7 +66,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             var httpHandler = mockRepository.CreateHttpStatusMessageHandler(HttpStatusCode.Forbidden);
             var serializer = mockRepository.Create<IRestClientSerializer>();
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
             Func<Task> action = async() => await messageHandler.GetAsync<SingleValueTestData>("authtest");
@@ -81,7 +81,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             var httpHandler = mockRepository.CreateHttpStatusMessageHandler(HttpStatusCode.NotFound);
             var serializer = mockRepository.Create<IRestClientSerializer>();
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
             Func<Task> action = async () => await messageHandler.GetAsync<SingleValueTestData>("authtest");
@@ -98,7 +98,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Deserialize<SingleValueTestData>(It.IsAny<Stream>())).Returns(new SingleValueTestData() { Field = "Hello" }).Verifiable();
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", httpHandler.Object, serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
 
             var data = await messageHandler.GetAsync<SingleValueTestData>("standardtypes");
 
