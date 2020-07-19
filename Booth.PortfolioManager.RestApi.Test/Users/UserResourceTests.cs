@@ -63,7 +63,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             password.AppendChar('t');
 
             Func<Task> a = async () => await resource.Authenticate("JoeBlogs", password);
-            a.Should().Throw<RestException>();
+            a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "users/authenticate"),
@@ -120,7 +120,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Users
             password.AppendChar('t');
 
             Func<Task> a = async () => await resource.Authenticate("JoeBlogs", password);
-            a.Should().Throw<RestException>();
+            a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "users/authenticate"),
