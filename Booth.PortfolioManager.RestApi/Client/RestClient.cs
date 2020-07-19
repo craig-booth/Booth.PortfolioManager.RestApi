@@ -23,8 +23,13 @@ namespace Booth.PortfolioManager.RestApi.Client
         public TransactionResource Transactions { get; }
 
         public RestClient(string baseURL)
+            : this(new HttpClient(), baseURL)
         {
-            MessageHandler = new RestClientMessageHandler(baseURL, new RestClientSerializer());
+        }
+
+        public RestClient(HttpClient httpClient, string baseURL)
+        {
+            MessageHandler = new RestClientMessageHandler(baseURL, httpClient, new RestClientSerializer());
 
             Stocks = new StockResource(MessageHandler);
             TradingCalander = new TradingCalandarResource(MessageHandler);
