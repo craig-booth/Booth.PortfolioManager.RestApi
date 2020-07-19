@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Craig Booth</Authors>
-    <Company />
+    <Company>Craig Booth</Company>
     <Product />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Booth.png</PackageIcon>
