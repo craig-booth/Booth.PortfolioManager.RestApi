@@ -16,7 +16,7 @@ using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Serialization;
 using Booth.PortfolioManager.RestApi.Test.Serialization;
 
-namespace Booth.PortfolioManager.RestApi.Test
+namespace Booth.PortfolioManager.RestApi.Test.Client
 {
     public class RestClientMessageHandlerGetAsyncTests
     {

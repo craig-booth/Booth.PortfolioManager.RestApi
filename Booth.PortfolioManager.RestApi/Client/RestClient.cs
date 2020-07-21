@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Security;
 using System.Runtime.CompilerServices;
 
+using Booth.PortfolioManager.RestApi.Users;
 using Booth.PortfolioManager.RestApi.Serialization;
 
 [assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.RestApi.Test")]
@@ -14,7 +15,7 @@ namespace Booth.PortfolioManager.RestApi.Client
 {
     public class RestClient
     {
-        public RestClientMessageHandler MessageHandler { get; private set; }   
+        public IRestClientMessageHandler MessageHandler { get; private set; }   
         public StockResource Stocks { get; }
         public TradingCalandarResource TradingCalander { get; }
         public CorporateActionResource CorporateActions { get; }
@@ -28,8 +29,13 @@ namespace Booth.PortfolioManager.RestApi.Client
         }
 
         public RestClient(HttpClient httpClient, string baseURL)
+            : this(new RestClientMessageHandler(baseURL, httpClient, new RestClientSerializer()), baseURL)
         {
-            MessageHandler = new RestClientMessageHandler(baseURL, httpClient, new RestClientSerializer());
+        }
+
+        public RestClient(IRestClientMessageHandler messageHandler, string baseURL)
+        {
+            MessageHandler = messageHandler;
 
             Stocks = new StockResource(MessageHandler);
             TradingCalander = new TradingCalandarResource(MessageHandler);
@@ -41,9 +47,22 @@ namespace Booth.PortfolioManager.RestApi.Client
 
         public async Task Authenticate(string userName, SecureString password)
         {
-            var userResource = new UserResource(MessageHandler);
+            SignOut();
 
-            await userResource.Authenticate(userName, password);
+            var request = new AuthenticationRequest()
+            {
+                UserName = userName,
+                Password = new System.Net.NetworkCredential(string.Empty, password).Password
+            };
+
+            var response = await MessageHandler.PostAsync<AuthenticationResponse, AuthenticationRequest>("users/authenticate", request);
+
+            MessageHandler.JwtToken = response.Token;
+        }
+
+        public void SignOut()
+        {
+            MessageHandler.JwtToken = null;
         }
 
         public void SetPortfolio(Guid portfolio)
