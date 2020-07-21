@@ -74,41 +74,55 @@ namespace Booth.PortfolioManager.RestApi.Client
 
             var contentStream = await httpResponse.Content.ReadAsStreamAsync();
 
-            var result = _Serializer.Deserialize<T>(contentStream);
+            using (var streamReader = new StreamReader(contentStream))
+            {
+                var result = _Serializer.Deserialize<T>(streamReader);
 
-            return result;
+                return result;
+            }
         }
 
         public async Task PostAsync<D>(string url, D data)
         {
             var contentStream = new MemoryStream();
-            _Serializer.Serialize<D>(contentStream, data);
 
-            var content = new StreamContent(contentStream);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            using (var streamWriter = new StreamWriter(contentStream))
+            {
+                _Serializer.Serialize<D>(streamWriter, data);
+                streamWriter.Flush();
 
-            var httpResponse = await _HttpClient.PostAsync(url, content);
-            if (!httpResponse.IsSuccessStatusCode)
-                throw new RestException(httpResponse.StatusCode, httpResponse.ReasonPhrase);
+                var content = new StreamContent(contentStream);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                var httpResponse = await _HttpClient.PostAsync(url, content);
+                if (!httpResponse.IsSuccessStatusCode)
+                    throw new RestException(httpResponse.StatusCode, httpResponse.ReasonPhrase);
+            }
         }
 
         public async Task<T> PostAsync<T, D>(string url, D data)
-        {
+        { 
             var contentStream = new MemoryStream();
-            _Serializer.Serialize<D>(contentStream, data);
-
             var content = new StreamContent(contentStream);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            using (var streamWriter = new StreamWriter(contentStream))
+            {
+                _Serializer.Serialize<D>(streamWriter, data);
+                streamWriter.Flush();
+            }
 
             var httpResponse = await _HttpClient.PostAsync(url, content);
             if (!httpResponse.IsSuccessStatusCode)
                 throw new RestException(httpResponse.StatusCode, httpResponse.ReasonPhrase);
 
+
             var responseStream = await httpResponse.Content.ReadAsStreamAsync();
-
-            var result = _Serializer.Deserialize<T>(responseStream);
-
-            return result;
+            using (var streamReader = new StreamReader(responseStream))
+            {
+                var result = _Serializer.Deserialize<T>(streamReader);
+                return result;
+            }
         }
     }
 }

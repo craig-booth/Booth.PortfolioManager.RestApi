@@ -92,7 +92,11 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             var json = "{\"field\":\"Hello\"}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-            var result = serializer.Deserialize<SingleValueTestData>(stream);
+            SingleValueTestData result;
+            using (var streamReader = new StreamReader(stream))
+            {
+                result = serializer.Deserialize<SingleValueTestData>(streamReader);
+            }
 
             var expected = new SingleValueTestData() { Field = "Hello" };
             result.Should().BeEquivalentTo(expected);
@@ -106,7 +110,14 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             var json = "{\"field\" \"Hello\"}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-            Action a = () => serializer.Deserialize<StandardTypesTestData>(stream);
+            Action a = () =>
+            {
+                using (var streamReader = new StreamReader(stream))
+                {
+                    serializer.Deserialize<StandardTypesTestData>(streamReader);
+                }
+            };
+
             a.Should().ThrowExactly<Newtonsoft.Json.JsonReaderException>();
         }
 
@@ -118,7 +129,11 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             var json = "{\"field\":\"Hello\"}";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-            var result = serializer.Deserialize<StandardTypesTestData>(stream);
+            StandardTypesTestData result;
+            using (var streamReader = new StreamReader(stream))
+            {
+                result = serializer.Deserialize<StandardTypesTestData>(streamReader);
+            }
 
             result.Should().BeEquivalentTo(new StandardTypesTestData());
         } 

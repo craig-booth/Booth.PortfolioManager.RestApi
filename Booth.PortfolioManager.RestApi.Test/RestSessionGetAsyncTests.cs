@@ -28,7 +28,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             HttpRequestMessage requestMessage = null;
             var httpHandler = mockRepository.CreateHttpStatusMessageHandler(HttpStatusCode.OK, x => requestMessage = x);
             var serializer = mockRepository.Create<IRestClientSerializer>();
-            serializer.Setup(x => x.Deserialize<Time>(It.IsAny<Stream>())).Returns(new Time());
+            serializer.Setup(x => x.Deserialize<Time>(It.IsAny<StreamReader>())).Returns(new Time());
 
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
 
@@ -47,7 +47,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             HttpRequestMessage requestMessage = null;
             var httpHandler = mockRepository.CreateHttpStatusMessageHandler(HttpStatusCode.OK, x => requestMessage = x);
             var serializer = mockRepository.Create<IRestClientSerializer>();
-            serializer.Setup(x => x.Deserialize<Time>(It.IsAny<Stream>())).Returns(new Time());
+            serializer.Setup(x => x.Deserialize<Time>(It.IsAny<StreamReader>())).Returns(new Time());
 
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.RestApi.Test
             var httpHandler = mockRepository.CreateJsonMessageHandler("{Field : \"Hello\"}");
 
             var serializer = mockRepository.Create<IRestClientSerializer>();
-            serializer.Setup(x => x.Deserialize<SingleValueTestData>(It.IsAny<Stream>())).Returns(new SingleValueTestData() { Field = "Hello" }).Verifiable();
+            serializer.Setup(x => x.Deserialize<SingleValueTestData>(It.IsAny<StreamReader>())).Returns(new SingleValueTestData() { Field = "Hello" }).Verifiable();
 
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
 

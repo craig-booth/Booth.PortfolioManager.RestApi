@@ -13,18 +13,18 @@ namespace Booth.PortfolioManager.RestApi.Serialization
     {
         string Serialize(object obj);
         string Serialize<T>(T obj);
-        void Serialize(Stream stream, object obj);
-        void Serialize<T>(Stream stream, T obj);
+        void Serialize(StreamWriter streamWriter, object obj);
+        void Serialize<T>(StreamWriter streamWriter, T obj);
 
         T Deserialize<T>(string source);
-        T Deserialize<T>(Stream stream);
+        T Deserialize<T>(StreamReader streamReader);
     }
     public class RestClientSerializer : IRestClientSerializer
     {
         private readonly JsonSerializer _Serializer;
         public RestClientSerializer()
         {
-            _Serializer = JsonSerializer.Create(RestSerializerSettings.Settings);
+            _Serializer = JsonSerializer.CreateDefault(RestSerializerSettings.Settings);
         }
 
         public T Deserialize<T>(string source)
@@ -38,16 +38,13 @@ namespace Booth.PortfolioManager.RestApi.Serialization
             }
         }
 
-        public T Deserialize<T>(Stream stream)
+        public T Deserialize<T>(StreamReader streamReader)
         {
-            using (var textReader = new StreamReader(stream))
+            using (var jsonReader = new JsonTextReader(streamReader))
             {
-                using (var jsonReader = new JsonTextReader(textReader))
-                {
-                    var obj = _Serializer.Deserialize<T>(jsonReader);
+                var obj = _Serializer.Deserialize<T>(jsonReader);
 
-                    return obj;
-                }
+                return obj;
             }
         }
 
@@ -67,20 +64,14 @@ namespace Booth.PortfolioManager.RestApi.Serialization
             return textWriter.ToString();
         }
 
-        public void Serialize(Stream stream, object obj)
+        public void Serialize(StreamWriter streamWriter, object obj)
         {
-            using (var streamWriter = new StreamWriter(stream))
-            {
-                _Serializer.Serialize(streamWriter, obj);
-            }
+            _Serializer.Serialize(streamWriter, obj);
         }
 
-        public void Serialize<T>(Stream stream, T obj)
+        public void Serialize<T>(StreamWriter streamWriter, T obj)
         {
-            using (var streamWriter = new StreamWriter(stream))
-            {
-                _Serializer.Serialize(streamWriter, obj, typeof(T));
-            }
+            _Serializer.Serialize(streamWriter, obj, typeof(T));
         }
     }
 

@@ -92,17 +92,29 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             var serializer = new RestClientSerializer();
             var stream = new MemoryStream();
 
-            var obj = new SingleValueTestData()
-            {
-                Field = "Hello",
-            };
-            serializer.Serialize(stream, obj);
-
+            JToken json;
             var expectedJson = JToken.Parse("{\"field\":\"Hello\"}");
 
-            var result = JToken.Parse(Encoding.UTF8.GetString(stream.ToArray()));
+            using (var streamWriter = new StreamWriter(stream))
+            {
+                var obj = new SingleValueTestData()
+                {
+                    Field = "Hello",
+                };
 
-            result.Should().BeEquivalentTo(expectedJson);
+                serializer.Serialize(streamWriter, obj);
+
+                streamWriter.Flush();
+                stream.Position = 0;
+
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var result = reader.ReadToEnd();
+                    json = JToken.Parse(result);
+                }
+            }
+
+            json.Should().BeEquivalentTo(expectedJson);
         }
 
         [Fact]
@@ -111,17 +123,30 @@ namespace Booth.PortfolioManager.RestApi.Test.Serialization
             var serializer = new RestClientSerializer();
             var stream = new MemoryStream();
 
-            var obj = new SingleValueTestData()
-            {
-                Field = "Hello",
-            };
-            serializer.Serialize<SingleValueTestData>(stream, obj);
-
+            JToken json;
             var expectedJson = JToken.Parse("{\"field\":\"Hello\"}");
 
-            var result = JToken.Parse(Encoding.UTF8.GetString(stream.ToArray()));
+            using (var streamWriter = new StreamWriter(stream))
+            {
+                var obj = new SingleValueTestData()
+                {
+                    Field = "Hello",
+                };
+                serializer.Serialize<SingleValueTestData>(streamWriter, obj);
 
-            result.Should().BeEquivalentTo(expectedJson);
+                streamWriter.Flush();
+                stream.Position = 0;
+
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var result = reader.ReadToEnd();
+                    json = JToken.Parse(result);
+                }
+            }
+                
+
+
+            json.Should().BeEquivalentTo(expectedJson);
         }
         
     }
