@@ -110,18 +110,18 @@ namespace Booth.PortfolioManager.RestApi.Client
             {
                 _Serializer.Serialize<D>(streamWriter, data);
                 streamWriter.Flush();
-            }
-
-            var httpResponse = await _HttpClient.PostAsync(url, content);
-            if (!httpResponse.IsSuccessStatusCode)
-                throw new RestException(httpResponse.StatusCode, httpResponse.ReasonPhrase);
 
 
-            var responseStream = await httpResponse.Content.ReadAsStreamAsync();
-            using (var streamReader = new StreamReader(responseStream))
-            {
-                var result = _Serializer.Deserialize<T>(streamReader);
-                return result;
+                var httpResponse = await _HttpClient.PostAsync(url, content);
+                if (!httpResponse.IsSuccessStatusCode)
+                    throw new RestException(httpResponse.StatusCode, httpResponse.ReasonPhrase);
+
+                var responseStream = await httpResponse.Content.ReadAsStreamAsync();
+                using (var streamReader = new StreamReader(responseStream))
+                {
+                    var result = _Serializer.Deserialize<T>(streamReader);
+                    return result;
+                }
             }
         }
     }

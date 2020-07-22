@@ -83,16 +83,21 @@ namespace Booth.PortfolioManager.RestApi.Serialization
             {
                 var settings = new JsonSerializerSettings();
 
-                settings.NullValueHandling = NullValueHandling.Ignore;
-                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                settings.Converters.Add(new StringEnumConverter() { CamelCaseText = true });
-                settings.Converters.Add(new DateJsonConverter());
-                settings.Converters.Add(new TimeJsonConverter());
-                settings.Converters.Add(new TransactionConverter());
-                settings.Converters.Add(new CorporateActionConverter());
+                Configure(settings);
 
                 return settings;
             }
+        }
+
+        public static void Configure(JsonSerializerSettings settings)
+        {
+            settings.NullValueHandling = NullValueHandling.Ignore;
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            settings.Converters.Add(new StringEnumConverter() { CamelCaseText = true });
+            settings.Converters.Add(new DateJsonConverter());
+            settings.Converters.Add(new TimeJsonConverter());
+            settings.Converters.Add(new TransactionConverter());
+            settings.Converters.Add(new CorporateActionConverter());
         }
     }
 }
