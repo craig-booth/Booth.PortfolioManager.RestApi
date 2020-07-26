@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             await client.Authenticate("JoeBlogs", password);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"), 
+                It.Is<string>(x => x == "authenticate"), 
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = "valid");   
         }
@@ -68,7 +68,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"),
+                It.Is<string>(x => x == "authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = null);
         }
@@ -95,7 +95,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             await client.Authenticate("JoeBlogs", password);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"),
+                It.Is<string>(x => x == "authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = null);
             messageHandler.VerifySet(x => x.JwtToken = "valid");
@@ -125,7 +125,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"),
+                It.Is<string>(x => x == "authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = null);     
         }
@@ -156,7 +156,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             messageHandler.Object.JwtToken.Should().BeNull();
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"),
+                It.Is<string>(x => x == "authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = null);
             messageHandler.VerifySet(x => x.JwtToken = "valid");       
@@ -205,10 +205,10 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             await client.Authenticate("JoeBlogs2", password);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"),
+                It.Is<string>(x => x == "authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs" && x.Password == "Secret")));
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
-                It.Is<string>(x => x == "users/authenticate"),
+                It.Is<string>(x => x == "authenticate"),
                 It.Is<AuthenticationRequest>(x => x.UserName == "JoeBlogs2" && x.Password == "Secret")));
             messageHandler.VerifySet(x => x.JwtToken = null);
             messageHandler.VerifySet(x => x.JwtToken = "valid");

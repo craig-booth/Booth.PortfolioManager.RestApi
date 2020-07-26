@@ -55,7 +55,7 @@ namespace Booth.PortfolioManager.RestApi.Client
                 Password = new System.Net.NetworkCredential(string.Empty, password).Password
             };
 
-            var response = await MessageHandler.PostAsync<AuthenticationResponse, AuthenticationRequest>("users/authenticate", request);
+            var response = await MessageHandler.PostAsync<AuthenticationResponse, AuthenticationRequest>("authenticate", request);
 
             MessageHandler.JwtToken = response.Token;
         }
