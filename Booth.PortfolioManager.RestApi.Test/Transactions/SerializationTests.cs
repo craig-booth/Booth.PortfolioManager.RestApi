@@ -269,7 +269,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 Units = 100,
                 AveragePrice = 12.45m,
                 TransactionCosts = 19.95m,
-                CgtMethod = CgtMethod.MinimizeGain,
+                CgtMethod = CgtCalculationMethod.MinimizeGain,
                 CreateCashTransaction = true
             };
 
@@ -322,7 +322,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
                 Units = 100,
                 AveragePrice = 12.45m,
                 TransactionCosts = 19.95m,
-                CgtMethod = CgtMethod.MinimizeGain,
+                CgtMethod = CgtCalculationMethod.MinimizeGain,
                 CreateCashTransaction = true
             };
 

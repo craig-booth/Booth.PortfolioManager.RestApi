@@ -7,6 +7,8 @@ using Booth.PortfolioManager.RestApi.Transactions;
 
 namespace Booth.PortfolioManager.RestApi.Portfolios
 {
+    public enum CgtMethod { Other, Discount, Indexation }
+
     public class CgtLiabilityResponse
     {
         public decimal CurrentYearCapitalGainsOther { get; set; }
