@@ -90,6 +90,7 @@ namespace Booth.PortfolioManager.RestApi.Client
             {
                 _Serializer.Serialize<D>(streamWriter, data);
                 streamWriter.Flush();
+                contentStream.Position = 0;
 
                 var content = new StreamContent(contentStream);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -110,7 +111,7 @@ namespace Booth.PortfolioManager.RestApi.Client
             {
                 _Serializer.Serialize<D>(streamWriter, data);
                 streamWriter.Flush();
-
+                contentStream.Position = 0;
 
                 var httpResponse = await _HttpClient.PostAsync(url, content);
                 if (!httpResponse.IsSuccessStatusCode)
