@@ -15,7 +15,7 @@ namespace Booth.PortfolioManager.RestApi.Portfolios
 
         public List<Transaction> Transactions { get; } = new List<Transaction>();
 
-        public void AddTransaction(DateTime date, CashTransactionType type, string description, decimal amount, decimal balance)
+        public void AddTransaction(Date date, CashTransactionType type, string description, decimal amount, decimal balance)
         {
             var transaction = new Transaction()
             {
@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.RestApi.Portfolios
 
         public class Transaction
         {
-            public DateTime Date { get; set; }
+            public Date Date { get; set; }
             public CashTransactionType Type { get; set; }
             public string Description { get; set; }
             public decimal Amount { get; set; }
