@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security;
 using System.Runtime.CompilerServices;
 
 using Booth.PortfolioManager.RestApi.Users;
@@ -45,14 +43,14 @@ namespace Booth.PortfolioManager.RestApi.Client
             Transactions = new TransactionResource(MessageHandler);
         }
 
-        public async Task Authenticate(string userName, SecureString password)
+        public async Task Authenticate(string userName, string password)
         {
             SignOut();
 
             var request = new AuthenticationRequest()
             {
                 UserName = userName,
-                Password = new System.Net.NetworkCredential(string.Empty, password).Password
+                Password = password
             };
 
             var response = await MessageHandler.PostAsync<AuthenticationResponse, AuthenticationRequest>("authenticate", request);

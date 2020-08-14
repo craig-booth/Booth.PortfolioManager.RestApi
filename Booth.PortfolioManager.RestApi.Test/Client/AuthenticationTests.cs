@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Net;
-using System.Security;
-using System.Net.Http;
 
 using Xunit;
 using FluentAssertions;
@@ -29,14 +27,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
-            var password = new SecureString();
-            password.AppendChar('S');
-            password.AppendChar('e');
-            password.AppendChar('c');
-            password.AppendChar('r');
-            password.AppendChar('e');
-            password.AppendChar('t');
-            await client.Authenticate("JoeBlogs", password);
+            await client.Authenticate("JoeBlogs", "Secret");
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "authenticate"), 
@@ -56,15 +47,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
-            var password = new SecureString();
-            password.AppendChar('S');
-            password.AppendChar('e');
-            password.AppendChar('c');
-            password.AppendChar('r');
-            password.AppendChar('e');
-            password.AppendChar('t');
-
-            Func<Task> a = async () => await client.Authenticate("JoeBlogs", password);
+            Func<Task> a = async () => await client.Authenticate("JoeBlogs", "Secret");
             a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
@@ -85,14 +68,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
-            var password = new SecureString();
-            password.AppendChar('S');
-            password.AppendChar('e');
-            password.AppendChar('c');
-            password.AppendChar('r');
-            password.AppendChar('e');
-            password.AppendChar('t');
-            await client.Authenticate("JoeBlogs", password);
+            await client.Authenticate("JoeBlogs", "Secret");
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "authenticate"),
@@ -113,15 +89,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
-            var password = new SecureString();
-            password.AppendChar('S');
-            password.AppendChar('e');
-            password.AppendChar('c');
-            password.AppendChar('r');
-            password.AppendChar('e');
-            password.AppendChar('t');
-
-            Func<Task> a = async () => await client.Authenticate("JoeBlogs", password);
+            Func<Task> a = async () => await client.Authenticate("JoeBlogs", "Secret");
             a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
@@ -142,14 +110,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
-            var password = new SecureString();
-            password.AppendChar('S');
-            password.AppendChar('e');
-            password.AppendChar('c');
-            password.AppendChar('r');
-            password.AppendChar('e');
-            password.AppendChar('t');
-            await client.Authenticate("JoeBlogs", password);
+            await client.Authenticate("JoeBlogs", "Secret");
 
             client.SignOut();
 
@@ -191,18 +152,11 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
-            var password = new SecureString();
-            password.AppendChar('S');
-            password.AppendChar('e');
-            password.AppendChar('c');
-            password.AppendChar('r');
-            password.AppendChar('e');
-            password.AppendChar('t');
-            await client.Authenticate("JoeBlogs", password);
+            await client.Authenticate("JoeBlogs", "Secret");
 
             client.SignOut();
 
-            await client.Authenticate("JoeBlogs2", password);
+            await client.Authenticate("JoeBlogs2", "Secret");
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "authenticate"),
