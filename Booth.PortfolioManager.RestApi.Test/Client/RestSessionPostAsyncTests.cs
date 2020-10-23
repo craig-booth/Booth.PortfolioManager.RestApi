@@ -33,7 +33,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Serialize<SingleValueTestData>(It.IsAny<StreamWriter>(), It.IsAny<SingleValueTestData>()));
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
 
             var data = new SingleValueTestData()
             {
@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             };
             await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
 
-            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/v2/authtest") });
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/authtest") });
             requestMessage.Headers.Should().NotContain("Authorisation");
         }
 
@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Serialize<SingleValueTestData>(It.IsAny<StreamWriter>(), It.IsAny<SingleValueTestData>()));
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
             var data = new SingleValueTestData()
             {
@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             };
             await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
 
-            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/v2/authtest") });
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/authtest") });
             requestMessage.Headers.Authorization.Should().BeEquivalentTo(new { Scheme = "Bearer", Parameter = "DummyToken" });
         }
 
@@ -77,7 +77,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Serialize<SingleValueTestData>(It.IsAny<StreamWriter>(), It.IsAny<SingleValueTestData>()));
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
             var data = new SingleValueTestData()
@@ -97,7 +97,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Serialize<SingleValueTestData>(It.IsAny<StreamWriter>(), It.IsAny<SingleValueTestData>()));
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
             var data = new SingleValueTestData()
@@ -119,7 +119,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var serializer = mockRepository.Create<IRestClientSerializer>();
             serializer.Setup(x => x.Serialize<SingleValueTestData>(It.IsAny<StreamWriter>(), It.Is<SingleValueTestData>(x => x.Field == "Hello"))).Verifiable();
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
 
             var data = new SingleValueTestData()
             {
@@ -143,7 +143,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             serializer.Setup(x => x.Serialize<SingleValueTestData>(It.IsAny<StreamWriter>(), It.Is<SingleValueTestData>(x => x.Field == "Hello"))).Verifiable();
             serializer.Setup(x => x.Deserialize<StandardTypesTestData>(It.IsAny<StreamReader>())).Returns(new StandardTypesTestData() { Integer = 5, String = "World" }).Verifiable();
 
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/v2/", new HttpClient(httpHandler.Object), serializer.Object);
+            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
 
             var data = new SingleValueTestData()
             {
