@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker 'mcr.microsoft.com/dotnet/core/sdk:3.0' }
+    agent { docker 'mcr.microsoft.com/dotnet/core/sdk:3.1' }
 	
 	environment {
 		PROJECT      = './Booth.PortfolioManager.RestApi/Booth.PortfolioManager.RestApi.csproj'
