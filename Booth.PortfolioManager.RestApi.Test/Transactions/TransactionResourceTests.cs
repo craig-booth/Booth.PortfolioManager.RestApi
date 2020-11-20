@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
-            messageHandler.Setup(x => x.GetAsync<Transaction>(It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions/" + transactionId)))
+            messageHandler.Setup(x => x.GetAsync<Transaction>(It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions/" + transactionId)))
                 .Returns(Task<Transaction>.FromResult(transaction as Transaction))
                 .Verifiable();
 
@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
             messageHandler.Setup(x => x.PostAsync<Transaction>(
-                It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions"),
+                It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions"),
                 It.Is<Transaction>(x => x.GetType() == transaction.GetType() &&  x.Id == transactionId))) 
                 .Returns(Task.CompletedTask)
                 .Verifiable();
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
             messageHandler.Setup(x => x.PostAsync<IEnumerable<Transaction>>(
-                It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions"),
+                It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions"),
                 It.Is<IEnumerable<Transaction>>(x => x.Count() == transactions.Count)))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
@@ -112,7 +112,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
 
             var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
             messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
-            messageHandler.Setup(x => x.GetAsync<List<Transaction>>(It.Is<string>(x => x == "portfolios/" + portfolioId + "/transactions/" + stockId + "/corporateactions/" + corporateActionId)))
+            messageHandler.Setup(x => x.GetAsync<List<Transaction>>(It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions/" + stockId + "/corporateactions/" + corporateActionId)))
                 .Returns(Task<List<Transaction>>.FromResult(transactions))
                 .Verifiable();
 
