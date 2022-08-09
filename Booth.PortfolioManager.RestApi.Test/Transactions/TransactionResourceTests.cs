@@ -95,6 +95,55 @@ namespace Booth.PortfolioManager.RestApi.Test.Transactions
             mockRepository.Verify();
         }
 
+        [Theory]
+        [MemberData(nameof(TransactionTypesData))]
+        public async Task UpdateTransaction(Transaction transaction)
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolioId = Guid.NewGuid();
+
+            var transactionId = Guid.NewGuid();
+            transaction.Id = transactionId;
+
+            var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
+            messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
+            messageHandler.Setup(x => x.PostAsync<Transaction>(
+                It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions/" + transactionId),
+                It.Is<Transaction>(x => x.GetType() == transaction.GetType() && x.Id == transactionId)))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var resource = new TransactionResource(messageHandler.Object);
+
+            await resource.Update(transaction);
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public async Task DeleteTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolioId = Guid.NewGuid();
+
+            var transactionId = Guid.NewGuid();
+
+            var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
+            messageHandler.SetupGet(x => x.Portfolio).Returns(portfolioId);
+            messageHandler.Setup(x => x.DeleteAsync(
+                It.Is<string>(x => x == "portfolio/" + portfolioId + "/transactions/" + transactionId)))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var resource = new TransactionResource(messageHandler.Object);
+
+            await resource.Delete(transactionId);
+
+            mockRepository.Verify();
+        }
+
         [Fact]
         public async Task GetTransactionsForCorporateAction()
         {

@@ -8,12 +8,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Booth.png</PackageIcon>
     <Description>Client for accessing PortfolioManager's Rest API</Description>
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.8" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
   </ItemGroup>
 
   <ItemGroup>

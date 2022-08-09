@@ -36,6 +36,20 @@ namespace Booth.PortfolioManager.RestApi.Client
             await _MessageHandler.PostAsync<IEnumerable<Transaction>>(url, transactions);
         }
 
+        public async Task Update(Transaction transaction)
+        {
+            var url = "portfolio/" + _MessageHandler.Portfolio + "/transactions/" + transaction.Id;
+
+            await _MessageHandler.PostAsync<Transaction>(url, transaction);
+        }
+
+        public async Task Delete(Guid id)
+        {
+            var url = "portfolio/" + _MessageHandler.Portfolio + "/transactions/" + id;
+
+            await _MessageHandler.DeleteAsync(url);
+        }
+
         public async Task<List<Transaction>> GetTransactionsForCorporateAction(Guid stock, Guid action)
         {
             return await _MessageHandler.GetAsync<List<Transaction>>("portfolio/" + _MessageHandler.Portfolio + "/transactions/" + stock.ToString() + "/corporateactions/" + action.ToString());

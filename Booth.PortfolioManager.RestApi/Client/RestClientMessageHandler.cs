@@ -24,6 +24,8 @@ namespace Booth.PortfolioManager.RestApi.Client
         Task<T> GetAsync<T>(string url);
         Task PostAsync<D>(string url, D data);
         Task<T> PostAsync<T, D>(string url, D data);
+
+        Task DeleteAsync(string url);    
     }
 
     public class RestClientMessageHandler : IRestClientMessageHandler
@@ -124,6 +126,13 @@ namespace Booth.PortfolioManager.RestApi.Client
                     return result;
                 }
             }
+        }
+
+        public async Task DeleteAsync(string url)
+        {
+            var httpResponse = await _HttpClient.DeleteAsync(url);
+            if (!httpResponse.IsSuccessStatusCode)
+                throw new RestException(httpResponse.StatusCode, httpResponse.ReasonPhrase);         
         }
     }
 }

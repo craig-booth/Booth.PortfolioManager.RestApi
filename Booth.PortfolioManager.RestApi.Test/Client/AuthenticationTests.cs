@@ -48,7 +48,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
             Func<Task> a = async () => await client.Authenticate("JoeBlogs", "Secret");
-            a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            a.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "authenticate"),
@@ -90,7 +90,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var client = new RestClient(messageHandler.Object, "http://test.com");
 
             Func<Task> a = async () => await client.Authenticate("JoeBlogs", "Secret");
-            a.Should().Throw<RestException>().Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            a.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
             messageHandler.Verify(x => x.PostAsync<AuthenticationResponse, AuthenticationRequest>(
                 It.Is<string>(x => x == "authenticate"),

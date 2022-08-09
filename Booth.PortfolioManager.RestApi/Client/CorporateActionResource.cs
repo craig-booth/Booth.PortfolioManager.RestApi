@@ -34,6 +34,14 @@ namespace Booth.PortfolioManager.RestApi.Client
         public async Task Add(Guid stockId, CorporateAction corporateAction)
         {
             await _MessageHandler.PostAsync<CorporateAction>("stocks/" + stockId + "/corporateactions", corporateAction);
-        } 
+        }
+        public async Task Update(Guid stockId, CorporateAction corporateAction)
+        {
+            await _MessageHandler.PostAsync<CorporateAction>("stocks/" + stockId + "/corporateactions/" + corporateAction.Id, corporateAction);
+        }
+        public async Task Delete(Guid stockId, Guid id)
+        {
+            await _MessageHandler.DeleteAsync("stocks/" + stockId + "/corporateactions/" + id);
+        }
     }
 }

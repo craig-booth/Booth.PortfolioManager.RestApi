@@ -18,7 +18,7 @@ using Booth.PortfolioManager.RestApi.Test.Serialization;
 
 namespace Booth.PortfolioManager.RestApi.Test.Client
 {
-    public class RestClientMessageHandlerGetAsyncTests
+    public class RestClientMessageHandlerDeleteAsyncTests
     {
         [Fact]
         public async Task WithoutAuthentication()
@@ -32,10 +32,9 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
 
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
 
-            var result = await messageHandler.GetAsync<Time>("authtest");
+            await messageHandler.DeleteAsync("authtest");
 
-
-            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Get, RequestUri = new Uri("http://test.com.au/api/authtest") });
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Delete, RequestUri = new Uri("http://test.com.au/api/authtest") });
             requestMessage.Headers.Authorization.Should().BeNull();
         }
         
@@ -52,9 +51,9 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
-            var result = await messageHandler.GetAsync<Time>("authtest");
+            await messageHandler.DeleteAsync("authtest");
 
-            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Get, RequestUri = new Uri("http://test.com.au/api/authtest") });
+            requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Delete, RequestUri = new Uri("http://test.com.au/api/authtest") });
             requestMessage.Headers.Authorization.Should().BeEquivalentTo(new { Scheme = "Bearer", Parameter = "DummyToken" });
         }
         
@@ -69,7 +68,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
-            Func<Task> action = async() => await messageHandler.GetAsync<SingleValueTestData>("authtest");
+            Func<Task> action = async() => await messageHandler.DeleteAsync("authtest");
             action.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
         
@@ -84,28 +83,10 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
             messageHandler.JwtToken = "DummyToken";
 
-            Func<Task> action = async () => await messageHandler.GetAsync<SingleValueTestData>("authtest");
+            Func<Task> action = async () => await messageHandler.DeleteAsync("authtest");
             action.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [Fact]
-        public async Task SerializeObjectWhenReceiving()
-        {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var httpHandler = mockRepository.CreateJsonMessageHandler("{Field : \"Hello\"}");
-
-            var serializer = mockRepository.Create<IRestClientSerializer>();
-            serializer.Setup(x => x.Deserialize<SingleValueTestData>(It.IsAny<StreamReader>())).Returns(new SingleValueTestData() { Field = "Hello" }).Verifiable();
-
-            var messageHandler = new RestClientMessageHandler("http://test.com.au/api/", new HttpClient(httpHandler.Object), serializer.Object);
-
-            var data = await messageHandler.GetAsync<SingleValueTestData>("standardtypes");
-
-            data.Field.Should().Be("Hello");
-
-            mockRepository.Verify();
-        }  
     }
 
 }

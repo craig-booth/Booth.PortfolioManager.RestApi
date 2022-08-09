@@ -65,6 +65,52 @@ namespace Booth.PortfolioManager.RestApi.Test.CorporateActions
             mockRepository.Verify();
         }
 
+        [Theory]
+        [MemberData(nameof(CorporateActionTypesData))]
+        public async Task UpdateCorporateAction(CorporateAction action)
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var actionId = Guid.NewGuid();
+            action.Id = actionId;
+            var stockId = Guid.NewGuid();
+            action.Stock = stockId;
+
+            var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
+            messageHandler.Setup(x => x.PostAsync<CorporateAction>(
+                It.Is<string>(x => x == "stocks/" + stockId + "/corporateactions/" + actionId),
+                It.Is<CorporateAction>(x => x.GetType() == action.GetType() && x.Id == actionId)))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var resource = new CorporateActionResource(messageHandler.Object);
+
+            await resource.Update(stockId, action);
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public async Task DeleteCorporateAction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var actionId = Guid.NewGuid();
+            var stockId = Guid.NewGuid();
+
+            var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
+            messageHandler.Setup(x => x.DeleteAsync(
+                It.Is<string>(x => x == "stocks/" + stockId + "/corporateactions/" + actionId)))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
+
+            var resource = new CorporateActionResource(messageHandler.Object);
+
+            await resource.Delete(stockId, actionId);
+
+            mockRepository.Verify();
+        }
+
         [Fact]
         public async Task GetAll()
         {

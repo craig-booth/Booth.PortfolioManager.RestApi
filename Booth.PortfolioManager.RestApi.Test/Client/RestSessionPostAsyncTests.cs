@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
             await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
 
             requestMessage.Should().BeEquivalentTo(new { Method = HttpMethod.Post, RequestUri = new Uri("http://test.com.au/api/authtest") });
-            requestMessage.Headers.Should().NotContain("Authorisation");
+            requestMessage.Headers.Authorization.Should().BeNull();
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
                 Field = "test"
             };
             Func<Task> action = async () => await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
-            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.Forbidden);
+            action.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Booth.PortfolioManager.RestApi.Test.Client
                 Field = "test"
             };
             Func<Task> action = async () => await messageHandler.PostAsync<SingleValueTestData>("authtest", data);
-            action.Should().ThrowExactly<RestException>().And.StatusCode.Equals(HttpStatusCode.NotFound);
+            action.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
