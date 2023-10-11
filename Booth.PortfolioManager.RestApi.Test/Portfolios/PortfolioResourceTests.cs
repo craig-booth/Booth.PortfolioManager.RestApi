@@ -10,11 +10,42 @@ using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.Common;
 using System.Xml.Schema;
+using Booth.PortfolioManager.RestApi.Stocks;
 
 namespace Booth.PortfolioManager.RestApi.Test.Portfolios
 {
     public class PortfolioResourceTests
     {
+
+        [Fact]
+        public async Task CreatePortfolio()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolioId = Guid.NewGuid();
+
+            var messageHandler = mockRepository.Create<IRestClientMessageHandler>();
+            messageHandler.Setup(x => x.PostAsync<CreatePortfolioCommand>(
+                            It.Is<string>(x => x == "portfolio"),
+                            It.Is<CreatePortfolioCommand>(x => x.Id == portfolioId && x.Name == "My Portfolio")))
+                       .Returns(Task.CompletedTask)
+                       .Verifiable();
+            messageHandler.SetupProperty(x => x.Portfolio);
+
+            var resource = new PortfolioResource(messageHandler.Object);
+
+            var portfolio = new CreatePortfolioCommand()
+            {
+                Id = portfolioId,
+                Name = "My Portfolio"
+            };
+            await resource.CreatePortfolio(portfolio);
+
+            messageHandler.Object.Portfolio.Should().Be(portfolioId);
+
+            mockRepository.Verify();
+        }
+
         [Fact]
         public async Task GetProperties()
         {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.RestApi.Stocks;
 
 namespace Booth.PortfolioManager.RestApi.Client
 {
@@ -15,6 +16,12 @@ namespace Booth.PortfolioManager.RestApi.Client
         public PortfolioResource(IRestClientMessageHandler messageHandler)
         {
             _MessageHandler = messageHandler;
+        }
+        public async Task CreatePortfolio(CreatePortfolioCommand command)
+        {
+            await _MessageHandler.PostAsync<CreatePortfolioCommand>("portfolio", command);
+
+            _MessageHandler.Portfolio = command.Id;
         }
 
         public async Task<PortfolioPropertiesResponse> GetProperties()
